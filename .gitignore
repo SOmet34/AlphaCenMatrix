@@ -1,0 +1,9 @@
+# Local QA harness, screenshots, and disposable browser profiles
+.qa/
+
+# Freebuff Desktop workspace metadata
+.freebuff/
+
+# OS and editor clutter
+.DS_Store
+Thumbs.db

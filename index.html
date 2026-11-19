@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#f3ecdd">
+  <meta name="description" content="A one-phone run tracker for comparing two robot designs at BEST Robotics practice.">
+  <title>BEST Robotics test log</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <p id="storage-banner" class="storage-banner" role="alert" hidden>
+    Storage is unavailable. Runs are kept only in memory for this tab — use Export CSV before closing it.
+  </p>
+
+  <main id="main" class="page" tabindex="-1">
+    <header class="masthead" aria-label="BEST Robotics field log">
+      <span class="masthead-title">BEST Robotics</span>
+      <span class="masthead-sub">Field log</span>
+    </header>
+
+    <section id="setup-view" class="setup" aria-labelledby="setup-title" hidden>
+      <div class="setup-head">
+        <div>
+          <p class="eyebrow">New practice test</p>
+          <h1 id="setup-title" tabindex="-1">What are you testing?</h1>
+          <p class="lede">Name the challenge and the two designs you want to compare.</p>
+        </div>
+        <button id="back-to-log" class="btn-quiet" type="button" hidden>Back to logging</button>
+      </div>
+
+      <form id="test-form" class="setup-form" novalidate>
+        <div class="field">
+          <label for="task-name">Task</label>
+          <input id="task-name" type="text" maxlength="90" autocomplete="off"
+                 enterkeyhint="next" placeholder="Floor pickup"
+                 aria-describedby="task-name-hint task-name-error">
+          <p id="task-name-hint" class="field-hint">For example: Floor pickup, autonomous stacking, or driver relay.</p>
+          <p class="field-error" id="task-name-error" hidden></p>
+        </div>
+
+        <div class="field-pair">
+          <div class="field">
+            <label for="design-a">Design A</label>
+            <input id="design-a" type="text" maxlength="32" autocomplete="off"
+                   enterkeyhint="next" placeholder="Wide claw"
+                   aria-describedby="design-a-error">
+            <p class="field-error" id="design-a-error" hidden></p>
+          </div>
+          <div class="field">
+            <label for="design-b">Design B</label>
+            <input id="design-b" type="text" maxlength="32" autocomplete="off"
+                   enterkeyhint="done" placeholder="Narrow claw"
+                   aria-describedby="design-b-error">
+            <p class="field-error" id="design-b-error" hidden></p>
+          </div>
+        </div>
+
+        <button class="btn btn-primary start-btn" type="submit">Start test</button>
+      </form>
+
+      <section id="saved-tests-section" class="saved-tests" aria-labelledby="saved-tests-title" hidden>
+        <div class="section-head">
+          <h2 id="saved-tests-title">Saved tests</h2>
+          <span class="section-index">Test index</span>
+        </div>
+        <ul id="test-list" class="test-list"></ul>
+      </section>
+    </section>
+
+    <section id="log-view" class="log" aria-labelledby="task-title" hidden>
+      <header class="log-head">
+        <div>
+          <p class="eyebrow">Active test</p>
+          <h1 id="task-title" tabindex="-1"></h1>
+        </div>
+        <span class="run-rule" aria-hidden="true">Log<br>runs</span>
+      </header>
+
+      <div class="practice-grid">
+        <div class="practice-column">
+          <div class="console">
+            <fieldset class="design-field">
+              <legend>Logging runs for</legend>
+              <div id="design-switch" class="design-switch"></div>
+            </fieldset>
+
+            <div class="outcomes">
+              <button id="success-btn" class="outcome-btn outcome-success" type="button">
+                <span class="outcome-symbol" aria-hidden="true">✓</span>
+                <span>Success</span>
+              </button>
+              <button id="miss-btn" class="outcome-btn outcome-miss" type="button">
+                <span class="outcome-symbol" aria-hidden="true">✗</span>
+                <span>Miss</span>
+              </button>
+            </div>
+
+            <div class="feedback">
+              <p id="feedback" class="feedback-text" role="status" aria-live="polite">
+                <span id="feedback-lead" class="feedback-lead"></span>
+                <span id="feedback-result" class="feedback-result">No runs recorded yet</span>
+              </p>
+              <button id="undo-btn" class="undo-btn" type="button" hidden>Undo</button>
+            </div>
+          </div>
+
+          <div class="toolbar">
+            <button id="switch-test" class="btn-quiet" type="button">Switch test</button>
+            <button id="export-btn" class="btn-quiet" type="button">Export CSV</button>
+          </div>
+        </div>
+
+        <section class="comparison-panel" aria-labelledby="comparison-title">
+          <div class="section-head">
+            <h2 id="comparison-title">Comparison</h2>
+            <span class="section-index">Successes / attempts · rate</span>
+          </div>
+          <table class="results-table">
+            <caption class="visually-hidden">Successes, attempts, and success rate by design</caption>
+            <thead>
+              <tr>
+                <th scope="col">Design</th>
+                <th scope="col">Record</th>
+              </tr>
+            </thead>
+            <tbody id="results-body"></tbody>
+          </table>
+        </section>
+      </div>
+
+      <section class="sheet-section note-section" aria-labelledby="note-title">
+        <div class="section-head">
+          <h2 id="note-title">Add note</h2>
+          <span class="section-index">Last run only</span>
+        </div>
+        <form id="note-form" class="note-form">
+          <label class="visually-hidden" for="note-input">Note for the last run</label>
+          <p id="note-target" class="note-target">No run to annotate yet.</p>
+          <div class="note-row">
+            <input id="note-input" type="text" maxlength="300" autocomplete="off"
+                   placeholder="Note for the last run"
+                   aria-describedby="note-target note-status" disabled>
+            <div class="note-actions">
+              <button id="note-save" class="btn btn-secondary" type="submit" disabled>Save note</button>
+              <button id="note-cancel" class="btn btn-quiet note-cancel" type="button" disabled>Cancel</button>
+            </div>
+          </div>
+          <p id="note-status" class="meta note-status" role="status"></p>
+        </form>
+      </section>
+
+      <section class="sheet-section history-section" aria-labelledby="runs-title">
+        <div class="section-head">
+          <h2 id="runs-title">Recent runs</h2>
+          <span id="run-total" class="section-index"></span>
+        </div>
+        <ol id="history" class="run-log"></ol>
+      </section>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
